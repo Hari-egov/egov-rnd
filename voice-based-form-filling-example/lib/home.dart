@@ -5,7 +5,6 @@
                This is an example app that demonstrates how a form can be filled using voice commands.
  */
 
-
 // The app has three fields: Name, Phone Number, and Email. The user can fill these fields by speaking into the microphone.
 // The app uses the speech_to_text package to convert speech to text and the flutter_tts package to convert text to speech.
 // The app also uses the DigitTextField widget from the digit_components package to create the form fields.
@@ -29,23 +28,13 @@
 // The app uses the Padding widget to add padding around the form fields.
 // The app uses the SingleChildScrollView widget to make the form scrollable when the keyboard is open.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+import 'package:digit_components/widgets/atoms/digit_checkbox.dart';
+import 'package:digit_components/widgets/atoms/digit_reactive_dropdown.dart';
+import 'package:digit_components/widgets/atoms/digit_text_form_field.dart';
+import 'package:digit_components/widgets/digit_outline_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:digit_components/digit_components.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class MyCustomForm extends StatefulWidget {
@@ -66,8 +55,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
     'email': FormControl<String>(
       validators: [Validators.required, Validators.email],
     ),
-    'bloodGroup': FormControl<String>(value: 'A+'), // Initial value can be set here
-    'agreed': FormControl<bool>(value: false), // Checkbox field
+    'bloodGroup': FormControl<String>(value: 'A+'),
+    'agreed': FormControl<bool>(value: false),
   });
 
   late stt.SpeechToText _speech;
@@ -202,7 +191,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 9, 9, 9),
         centerTitle: true,
-        title: const Text('Digit Test Form App', style: TextStyle(color: Colors.white)),
+        title: const Text('Digit Test Form App',
+            style: TextStyle(color: Colors.white)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -212,57 +202,90 @@ class _MyCustomFormState extends State<MyCustomForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: Focus(
+                //         onFocusChange: (hasFocus) {
+                //           if (hasFocus) {
+                //             _speakLabelText('Name');
+                //           }
+                //         },
+
+                //         child: DigitTextFormField(
+                //           formControlName: 'name',
+                //           label: 'Name',
+                //           focusNode: _nameFocus,
+                //           validationMessages: {
+                //             'required': (_) => 'Please enter your name',
+                //           },
+                //         ),
+                //       ),
+                //     ),
+                //     IconButton(
+                //       icon: Icon(_isListening && _currentField == 'name'
+                //           ? Icons.mic
+                //           : Icons.mic_none),
+                //       onPressed: () => _listen('name'),
+                //     ),
+                //   ],
+                // ),
+
+                // Modified DigitTextFormField to include enableVoiceCommand property inclusively
+                // instead of using FocusNode and IconButton to listen for voice commands
                 Row(
                   children: [
                     Expanded(
-                      child: Focus(
-                        onFocusChange: (hasFocus) {
-                          if (hasFocus) {
-                            _speakLabelText('Name');
-                          }
+                      child: DigitTextFormField(
+                        formControlName: 'name',
+                        label: 'Name',
+                        enableVoiceCommand: true,
+                        validationMessages: {
+                          'required': (_) => 'Please enter your name',
                         },
-                        child: DigitTextFormField(
-                          formControlName: 'name',
-                          label: 'Name',
-                          focusNode: _nameFocus,
-                          validationMessages: {
-                            'required': (_) => 'Please enter your name',
-                          },
-                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(_isListening && _currentField == 'name'
-                          ? Icons.mic
-                          : Icons.mic_none),
-                      onPressed: () => _listen('name'),
                     ),
                   ],
                 ),
+
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: Focus(
+                //         onFocusChange: (hasFocus) {
+                //           if (hasFocus) {
+                //             _speakLabelText('Phone Number');
+                //           }
+                //         },
+                //         child: DigitTextFormField(
+                //           formControlName: 'phone',
+                //           label: 'Phone Number',
+                //           focusNode: _phoneFocus,
+                //           validationMessages: {
+                //             'required': (_) => 'Please enter your phone number',
+                //           },
+                //         ),
+                //       ),
+                //     ),
+                //     IconButton(
+                //       icon: Icon(_isListening && _currentField == 'phone'
+                //           ? Icons.mic
+                //           : Icons.mic_none),
+                //       onPressed: () => _listen('phone'),
+                //     ),
+                //   ],
+                // ),
                 Row(
                   children: [
                     Expanded(
-                      child: Focus(
-                        onFocusChange: (hasFocus) {
-                          if (hasFocus) {
-                            _speakLabelText('Phone Number');
-                          }
+                      child: DigitTextFormField(
+                        formControlName: 'phone',
+                        label: 'Phone Number',
+                        enableVoiceCommand: true,
+                        validationMessages: {
+                          'required': (_) => 'Please enter your phone number',
                         },
-                        child: DigitTextFormField(
-                          formControlName: 'phone',
-                          label: 'Phone Number',
-                          focusNode: _phoneFocus,
-                          validationMessages: {
-                            'required': (_) => 'Please enter your phone number',
-                          },
-                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(_isListening && _currentField == 'phone'
-                          ? Icons.mic
-                          : Icons.mic_none),
-                      onPressed: () => _listen('phone'),
                     ),
                   ],
                 ),
@@ -294,6 +317,21 @@ class _MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ],
                 ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: DigitTextFormField(
+                //         formControlName: 'email',
+                //         label: 'Email',
+                //         enableVoiceCommand: true,
+                //         validationMessages: {
+                //           'required': (_) => 'Please enter your name',
+                //           'email': (_) => 'Invalid email format',
+                //         },
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
@@ -338,15 +376,25 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: DigitCheckboxTile(
-                          margin: const EdgeInsets.only(top: 16),
+                        child: DigitCheckbox(
                           padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
                           label: 'I agree to the terms and conditions',
-                          value: (form.control('agreed').value ?? false) as bool,
                           onChanged: (value) {
                             form.control('agreed').value = value;
                           },
+                          value:
+                              (form.control('agreed').value ?? false) as bool,
                         ),
+
+                        // child: DigitCheckboxTile(
+                        //   margin: const EdgeInsets.only(top: 16),
+                        //   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
+                        //   label: 'I agree to the terms and conditions',
+                        //   value: (form.control('agreed').value ?? false) as bool,
+                        //   onChanged: (value) {
+                        //     form.control('agreed').value = value;
+                        //   },
+                        // ),
                       ),
                       IconButton(
                         icon: Icon(_isListening && _currentField == 'agreed'
@@ -363,6 +411,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                     label: 'Submit',
                     onPressed: _submitForm,
                   ),
+                  //child : Button(label:'Submit', onPressed:_submitForm, type: ButtonType.primary, )
                 ),
               ],
             ),
