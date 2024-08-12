@@ -28,6 +28,8 @@
 // The app uses the Padding widget to add padding around the form fields.
 // The app uses the SingleChildScrollView widget to make the form scrollable when the keyboard is open.
 
+
+import 'package:digit_components/widgets/atoms/bloc/speech_bloc.dart';
 import 'package:digit_components/widgets/atoms/digit_checkbox.dart';
 import 'package:digit_components/widgets/atoms/digit_reactive_dropdown.dart';
 import 'package:digit_components/widgets/atoms/digit_text_form_field.dart';
@@ -36,6 +38,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyCustomForm extends StatefulWidget {
   const MyCustomForm({super.key});
@@ -55,8 +58,9 @@ class _MyCustomFormState extends State<MyCustomForm> {
     'email': FormControl<String>(
       validators: [Validators.required, Validators.email],
     ),
-    'bloodGroup': FormControl<String>(value: 'A+'),
-    'agreed': FormControl<bool>(value: false),
+    'bloodGroup':
+        FormControl<String>(value: 'A+'), 
+    'agreed': FormControl<bool>(value: false), 
   });
 
   late stt.SpeechToText _speech;
@@ -230,19 +234,19 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 //     ),
                 //   ],
                 // ),
-
-                // Modified DigitTextFormField to include enableVoiceCommand property inclusively
-                // instead of using FocusNode and IconButton to listen for voice commands
                 Row(
                   children: [
-                    Expanded(
-                      child: DigitTextFormField(
-                        formControlName: 'name',
-                        label: 'Name',
-                        enableVoiceCommand: true,
-                        validationMessages: {
-                          'required': (_) => 'Please enter your name',
-                        },
+                    BlocProvider(
+                      create: (context) => VoiceBloc(),
+                      child: Expanded(
+                        child: DigitTextFormField(
+                          formControlName: 'name',
+                          label: 'Name',
+                          enableVoiceCommand: true,
+                          validationMessages: {
+                            'required': (_) => 'Please enter your name',
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -277,35 +281,41 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 // ),
                 Row(
                   children: [
-                    Expanded(
-                      child: DigitTextFormField(
-                        formControlName: 'phone',
-                        label: 'Phone Number',
-                        enableVoiceCommand: true,
-                        validationMessages: {
-                          'required': (_) => 'Please enter your phone number',
-                        },
+                    BlocProvider(
+                      create: (context) => VoiceBloc(),
+                      child: Expanded(
+                        child: DigitTextFormField(
+                          formControlName: 'phone',
+                          label: 'Phone Number',
+                          enableVoiceCommand: true,
+                          validationMessages: {
+                            'required': (_) => 'Please enter your phone number',
+                          },
+                        ),
                       ),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    Expanded(
-                      child: Focus(
-                        onFocusChange: (hasFocus) {
-                          if (hasFocus) {
-                            _speakLabelText('Email');
-                          }
-                        },
-                        child: DigitTextFormField(
-                          formControlName: 'email',
-                          label: 'Email',
-                          focusNode: _emailFocus,
-                          validationMessages: {
-                            'required': (_) => 'Please enter your email',
-                            'email': (_) => 'Invalid email format',
+                    BlocProvider(
+                      create: (context) => VoiceBloc(),
+                      child: Expanded(
+                        child: Focus(
+                          onFocusChange: (hasFocus) {
+                            if (hasFocus) {
+                              _speakLabelText('Email');
+                            }
                           },
+                          child: DigitTextFormField(
+                            formControlName: 'email',
+                            label: 'Email',
+                            focusNode: _emailFocus,
+                            validationMessages: {
+                              'required': (_) => 'Please enter your email',
+                              'email': (_) => 'Invalid email format',
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -317,21 +327,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ],
                 ),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: DigitTextFormField(
-                //         formControlName: 'email',
-                //         label: 'Email',
-                //         enableVoiceCommand: true,
-                //         validationMessages: {
-                //           'required': (_) => 'Please enter your name',
-                //           'email': (_) => 'Invalid email format',
-                //         },
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
