@@ -1,7 +1,8 @@
+import 'package:digit_components/widgets/atoms/bloc/reactivesearchdropdownbloc.dart';
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:digit_components/digit_components.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -29,23 +30,26 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              DigitReactiveSearchDropdown(
-                label: 'Fruits',
-                form: form,
-                enableVoiceCommand: true,
-                menuItems: const [
-                  'Apple',
-                  'Banana',
-                  'Cherry',
-                  'Date',
-                  'Elderberry',
-                  'Fig',
-                  'Grape',
-                  'Honeydew',
-                ],
-                formControlName: 'dropdown',
-                valueMapper: valueMapper,
-                validationMessage: 'Please select a fruit',
+              BlocProvider(
+                create: (context) => DigitReactiveSearchDropdownBloc(),
+                child: DigitReactiveSearchDropdown(
+                  label: 'Fruits',
+                  form: form,
+                  enableVoiceCommand: true,
+                  menuItems: const [
+                    'Apple',
+                    'Banana',
+                    'Cherry',
+                    'Date',
+                    'Elderberry',
+                    'Fig',
+                    'Grape',
+                    'Honeydew',
+                  ],
+                  formControlName: 'dropdown',
+                  valueMapper: valueMapper,
+                  validationMessage: 'Please select a fruit',
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -68,7 +72,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
-
-
