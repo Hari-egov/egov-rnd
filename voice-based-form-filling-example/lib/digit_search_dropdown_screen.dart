@@ -1,16 +1,27 @@
-import 'package:digit_components/widgets/atoms/bloc/reactivesearchdropdownbloc.dart';
+
+/*
+
+This file demonstrates how to use the DigitReactiveSearchDropdown widget work 
+with voice command feature along with BlocProvider and ReactiveForm.
+
+*/
+
+
+
 import 'package:flutter/material.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+import 'package:digit_components/widgets/atoms/bloc/digit_reactive_search_dropdown_bloc.dart';
+
+class DigitSearchDropDownScreen extends StatefulWidget {
+  const DigitSearchDropDownScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<DigitSearchDropDownScreen> createState() => _DigitSearchDropDownScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _DigitSearchDropDownScreenState extends State<DigitSearchDropDownScreen> {
   final FormGroup form = FormGroup({
     'dropdown': FormControl<String>(validators: [Validators.required]),
   });
@@ -72,3 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+
+
+
