@@ -60,7 +60,7 @@ class SpeechResultEvent extends SpeechEvent {
 /*
  * BLoC Implementation:
  * 
- * `SpeechBloc` handles the business logic related to speech recognition using the `speech_to_text` package.
+ * `DigitIntegerFormBloc` handles the business logic related to speech recognition using the `speech_to_text` package.
  * It manages state transitions based on events and interacts with the speech-to-text service.
  */
 class DigitIntegerFormBloc extends Bloc<SpeechEvent, SpeechState> {
