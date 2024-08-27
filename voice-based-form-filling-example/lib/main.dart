@@ -1,3 +1,4 @@
+import 'package:dummy2/digit_integer_form_screen.dart';
 import 'package:dummy2/digit_search_dropdown_screen.dart';
 import 'package:dummy2/digit_text_form_screen.dart';
 import 'package:dummy2/home.dart';
@@ -17,9 +18,12 @@ class MyApp extends StatelessWidget {
       theme: DigitTheme.instance.mobileTheme,
       debugShowCheckedModeBanner: false,
      // home:  DigitTextScreen(),
-     
+
      // now for DigitSearchDropDownScreen
-     home: const DigitSearchDropDownScreen(),
+    //  home: const DigitSearchDropDownScreen(),
+
+    // now for DigitIntegerFormPicker
+    home: DigitIntegerFormScreen(),
     );
   }
 }
