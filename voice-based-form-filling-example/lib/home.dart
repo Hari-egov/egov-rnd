@@ -29,7 +29,7 @@
 // The app uses the SingleChildScrollView widget to make the form scrollable when the keyboard is open.
 
 
-import 'package:digit_components/widgets/atoms/bloc/speech_bloc.dart';
+import 'package:digit_components/widgets/atoms/bloc/digit_text_form_bloc.dart';
 import 'package:digit_components/widgets/atoms/digit_checkbox.dart';
 import 'package:digit_components/widgets/atoms/digit_reactive_dropdown.dart';
 import 'package:digit_components/widgets/atoms/digit_text_form_field.dart';
@@ -237,7 +237,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 Row(
                   children: [
                     BlocProvider(
-                      create: (context) => VoiceBloc(),
+                      create: (context) => DigitTextFormBloc(),
                       child: Expanded(
                         child: DigitTextFormField(
                           formControlName: 'name',
@@ -282,7 +282,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 Row(
                   children: [
                     BlocProvider(
-                      create: (context) => VoiceBloc(),
+                      create: (context) => DigitTextFormBloc(),
                       child: Expanded(
                         child: DigitTextFormField(
                           formControlName: 'phone',
@@ -299,7 +299,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                 Row(
                   children: [
                     BlocProvider(
-                      create: (context) => VoiceBloc(),
+                      create: (context) => DigitTextFormBloc(),
                       child: Expanded(
                         child: Focus(
                           onFocusChange: (hasFocus) {

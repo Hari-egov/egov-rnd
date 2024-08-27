@@ -1,5 +1,263 @@
+import 'package:digit_components/digit_components.dart';
+import 'package:digit_components/widgets/atoms/bloc/digit_text_form_bloc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:reactive_forms/reactive_forms.dart';
+import 'package:remove_emoji_input_formatter/remove_emoji_input_formatter.dart';
 
-// // modified the DigitTextFormField to include voice command feature including the speech to text and text to speech features
+
+class DigitTextFormField extends StatefulWidget {
+  final bool readOnly;
+  final String formControlName;
+  final String? hint;
+  final String? hintText;
+  final Widget? suffix;
+  final bool isRequired;
+  final int minLines;
+  final int maxLines;
+  final int? maxLength;
+  final TextInputType keyboardType;
+  final FocusNode? focusNode;
+  final VoidCallback? onTap;
+  final bool obscureText;
+  final String label;
+  final int? minLength;
+  final Widget? suffixIcon;
+  final void Function(FormControl<dynamic>)? onChanged;
+  final TextCapitalization textCapitalization;
+  final ControlValueAccessor<dynamic, String>? valueAccessor;
+  final Map<String, String Function(Object control)>? validationMessages;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? prefixText;
+  final Widget? prefixIcon;
+  final TextStyle? labelStyle;
+  final EdgeInsets? padding;
+  final bool? hideKeyboard;
+  final bool enableVoiceCommand;
+
+  const DigitTextFormField({
+    super.key,
+    required this.label,
+    required this.formControlName,
+    this.hint,
+    this.suffix,
+    this.minLines = 1,
+    this.maxLines = 1,
+    this.valueAccessor,
+    this.maxLength,
+    this.onTap,
+    this.focusNode,
+    this.validationMessages,
+    this.suffixIcon,
+    this.keyboardType = TextInputType.text,
+    this.textCapitalization = TextCapitalization.sentences,
+    this.obscureText = false,
+    this.isRequired = false,
+    this.readOnly = false,
+    this.onChanged,
+    this.minLength,
+    this.inputFormatters,
+    this.prefixIcon,
+    this.prefixText,
+    this.hintText,
+    this.labelStyle,
+    this.padding,
+    this.hideKeyboard = false,
+    this.enableVoiceCommand = false,
+  });
+
+  @override
+  _DigitTextFormFieldState createState() => _DigitTextFormFieldState();
+}
+
+class _DigitTextFormFieldState extends State<DigitTextFormField> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final form = ReactiveForm.of(context) as FormGroup;
+
+    return BlocBuilder<DigitTextFormBloc, VoiceState>(
+      builder: (context, state) {
+        String recognizedText = '';
+        if (state is VoiceTextUpdated) {
+          recognizedText = state.text;
+          form.control(widget.formControlName).value = recognizedText;
+        }
+
+        return LabeledField(
+          label: '${widget.label} ${widget.isRequired ? '*' : ''}',
+          padding: widget.padding ??
+              const EdgeInsets.only(
+                top: kPadding * 2,
+              ),
+          labelStyle: widget.labelStyle ?? Theme.of(context).textTheme.bodyLarge,
+          child: Column(
+            children: [
+              Container(
+                color: widget.readOnly ? const DigitColors().seaShellGray : null,
+                child: ReactiveTextField(
+                  onChanged: widget.onChanged,
+                  readOnly: widget.readOnly,
+                  formControlName: widget.formControlName,
+                  maxLength: widget.maxLength,
+                  validationMessages: widget.validationMessages,
+                  autofocus: false,
+                  textCapitalization: widget.textCapitalization,
+                  minLines: widget.minLines,
+                  maxLines: widget.maxLines,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: (widget.readOnly && widget.hideKeyboard == false)
+                        ? const DigitColors().davyGray
+                        : DigitTheme.instance.colorScheme.onBackground,
+                  ),
+                  obscureText: widget.obscureText,
+                  focusNode: widget.focusNode,
+                  keyboardType: widget.keyboardType,
+                  inputFormatters: [
+                    RemoveEmojiInputFormatter(),
+                    ...?widget.inputFormatters
+                  ],
+                  valueAccessor: widget.valueAccessor,
+                  decoration: (widget.readOnly && widget.hideKeyboard == false)
+                      ? InputDecoration(
+                          enabledBorder: DigitTheme
+                              .instance.inputDecorationTheme.disabledBorder,
+                          fillColor: DigitTheme.instance.colors.cloudGray,
+                          focusedBorder: DigitTheme
+                              .instance.inputDecorationTheme.disabledBorder,
+                          focusColor: DigitTheme.instance.colors.cloudGray,
+                          suffixIcon: widget.enableVoiceCommand
+                              ? IconButton(
+                                  icon: Icon(context.watch<DigitTextFormBloc>().state is VoiceListening
+                                      ? Icons.mic
+                                      : Icons.mic_none),
+                                  onPressed: () {
+                                    final voiceBloc = context.read<DigitTextFormBloc>();
+                                    if (context.read<DigitTextFormBloc>().state
+                                        is VoiceListening) {
+                                      voiceBloc.add(StopListening());
+                                    } else {
+                                      voiceBloc.add(StartListening());
+                                    }
+                                  },
+                                )
+                              : (widget.suffix == null
+                                  ? null
+                                  : InkWell(
+                                      onTap: widget.onTap,
+                                      child: widget.suffix,
+                                    )),
+                          prefixIconConstraints:
+                              const BoxConstraints(minWidth: 0, minHeight: 0),
+                          prefixStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w200,
+                              color: widget.readOnly
+                                  ? const DigitColors().hintGrey
+                                  : DigitTheme.instance.colorScheme.onBackground),
+                          prefixIcon: widget.prefixIcon ??
+                              (widget.prefixText == ''
+                                  ? null
+                                  : Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, left: 10, bottom: 10, right: 0),
+                                      child: Text(
+                                        widget.prefixText ?? '',
+                                        style: TextStyle(
+                                            fontSize: kIsWeb ? 15 : 16,
+                                            fontWeight: FontWeight.w200,
+                                            color: widget.readOnly
+                                                ? const DigitColors().hintGrey
+                                                : DigitTheme
+                                                    .instance.colorScheme
+                                                    .onBackground),
+                                      ),
+                                    )),
+                        )
+                      : InputDecoration(
+                          labelText: widget.hint,
+                          suffixIconConstraints: const BoxConstraints(
+                            maxHeight: 40,
+                            maxWidth: 100,
+                          ),
+                          prefixIconConstraints:
+                              const BoxConstraints(minWidth: 0, minHeight: 0),
+                          prefixStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: widget.readOnly
+                                ? const DigitColors().hintGrey
+                                : DigitTheme.instance.colorScheme.onBackground,
+                          ),
+                          prefixIcon: widget.prefixIcon ??
+                              (widget.prefixText == ''
+                                  ? null
+                                  : Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10, left: 10, bottom: 10, right: 0),
+                                      child: Text(
+                                        widget.prefixText ?? '',
+                                        style: TextStyle(
+                                          fontSize: kIsWeb ? 15 : 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: widget.readOnly
+                                              ? const DigitColors().hintGrey
+                                              : DigitTheme.instance.colorScheme
+                                                  .onBackground,
+                                        ),
+                                      ),
+                                    )),
+                          suffixIcon: widget.enableVoiceCommand
+                              ? IconButton(
+                                  icon: Icon(context.watch<DigitTextFormBloc>().state is VoiceListening
+                                      ? Icons.mic
+                                      : Icons.mic_none),
+                                  onPressed: () {
+                                    final voiceBloc = context.read<DigitTextFormBloc>();
+                                    if (context.read<DigitTextFormBloc>().state is VoiceListening) {
+                                      voiceBloc.add(StopListening());
+                                    } else {
+                                      voiceBloc.add(StartListening());
+                                    }
+                                  },
+                                )
+                              : (widget.suffix == null
+                                  ? null
+                                  : InkWell(
+                                      onTap: widget.onTap,
+                                      child: widget.suffix,
+                                    )),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// old code
 
 
 // import 'package:digit_components/digit_components.dart';
@@ -502,262 +760,5 @@
 //     );
 //   }
 // }
-
-
-
-// with bloc pattern
-
-
-
-
-import 'package:digit_components/digit_components.dart';
-import 'package:digit_components/widgets/atoms/bloc/speech_bloc.dart';
-import 'package:digit_components/widgets/atoms/bloc/speech_event.dart';
-import 'package:digit_components/widgets/atoms/bloc/speech_state.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reactive_forms/reactive_forms.dart';
-import 'package:remove_emoji_input_formatter/remove_emoji_input_formatter.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
-
-class DigitTextFormField extends StatefulWidget {
-  final bool readOnly;
-  final String formControlName;
-  final String? hint;
-  final String? hintText;
-  final Widget? suffix;
-  final bool isRequired;
-  final int minLines;
-  final int maxLines;
-  final int? maxLength;
-  final TextInputType keyboardType;
-  final FocusNode? focusNode;
-  final VoidCallback? onTap;
-  final bool obscureText;
-  final String label;
-  final int? minLength;
-  final Widget? suffixIcon;
-  final void Function(FormControl<dynamic>)? onChanged;
-  final TextCapitalization textCapitalization;
-  final ControlValueAccessor<dynamic, String>? valueAccessor;
-  final Map<String, String Function(Object control)>? validationMessages;
-  final List<TextInputFormatter>? inputFormatters;
-  final String? prefixText;
-  final Widget? prefixIcon;
-  final TextStyle? labelStyle;
-  final EdgeInsets? padding;
-  final bool? hideKeyboard;
-  final bool enableVoiceCommand;
-
-  const DigitTextFormField({
-    super.key,
-    required this.label,
-    required this.formControlName,
-    this.hint,
-    this.suffix,
-    this.minLines = 1,
-    this.maxLines = 1,
-    this.valueAccessor,
-    this.maxLength,
-    this.onTap,
-    this.focusNode,
-    this.validationMessages,
-    this.suffixIcon,
-    this.keyboardType = TextInputType.text,
-    this.textCapitalization = TextCapitalization.sentences,
-    this.obscureText = false,
-    this.isRequired = false,
-    this.readOnly = false,
-    this.onChanged,
-    this.minLength,
-    this.inputFormatters,
-    this.prefixIcon,
-    this.prefixText,
-    this.hintText,
-    this.labelStyle,
-    this.padding,
-    this.hideKeyboard = false,
-    this.enableVoiceCommand = false,
-  });
-
-  @override
-  _DigitTextFormFieldState createState() => _DigitTextFormFieldState();
-}
-
-class _DigitTextFormFieldState extends State<DigitTextFormField> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final form = ReactiveForm.of(context) as FormGroup;
-
-    return BlocBuilder<VoiceBloc, VoiceState>(
-      builder: (context, state) {
-        String recognizedText = '';
-        if (state is VoiceTextUpdated) {
-          recognizedText = state.text;
-          form.control(widget.formControlName).value = recognizedText;
-        }
-
-        return LabeledField(
-          label: '${widget.label} ${widget.isRequired ? '*' : ''}',
-          padding: widget.padding ??
-              const EdgeInsets.only(
-                top: kPadding * 2,
-              ),
-          labelStyle: widget.labelStyle ?? Theme.of(context).textTheme.bodyLarge,
-          child: Column(
-            children: [
-              Container(
-                color: (widget.readOnly) ? const DigitColors().seaShellGray : null,
-                child: ReactiveTextField(
-                  onChanged: widget.onChanged,
-                  readOnly: widget.readOnly,
-                  formControlName: widget.formControlName,
-                  maxLength: widget.maxLength,
-                  validationMessages: widget.validationMessages,
-                  autofocus: false,
-                  textCapitalization: widget.textCapitalization,
-                  minLines: widget.minLines,
-                  maxLines: widget.maxLines,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: (widget.readOnly && widget.hideKeyboard == false)
-                        ? const DigitColors().davyGray
-                        : DigitTheme.instance.colorScheme.onBackground,
-                  ),
-                  obscureText: widget.obscureText,
-                  focusNode: widget.focusNode,
-                  keyboardType: widget.keyboardType,
-                  inputFormatters: [
-                    RemoveEmojiInputFormatter(),
-                    ...?widget.inputFormatters
-                  ],
-                  valueAccessor: widget.valueAccessor,
-                  decoration: (widget.readOnly && widget.hideKeyboard == false)
-                      ? InputDecoration(
-                          enabledBorder: DigitTheme
-                              .instance.inputDecorationTheme.disabledBorder,
-                          fillColor: DigitTheme.instance.colors.cloudGray,
-                          focusedBorder: DigitTheme
-                              .instance.inputDecorationTheme.disabledBorder,
-                          focusColor: DigitTheme.instance.colors.cloudGray,
-                          suffixIcon: widget.enableVoiceCommand
-                              ? IconButton(
-                                  icon: Icon(context.watch<VoiceBloc>().state is VoiceListening
-                                      ? Icons.mic
-                                      : Icons.mic_none),
-                                  onPressed: () {
-                                    final voiceBloc = context.read<VoiceBloc>();
-                                    if (context.read<VoiceBloc>().state is VoiceListening) {
-                                      voiceBloc.add(StopListening());
-                                    } else {
-                                      voiceBloc.add(StartListening());
-                                    }
-                                  },
-                                )
-                              : (widget.suffix == null
-                                  ? null
-                                  : InkWell(
-                                      onTap: widget.onTap,
-                                      child: widget.suffix,
-                                    )),
-                          prefixIconConstraints:
-                              const BoxConstraints(minWidth: 0, minHeight: 0),
-                          prefixStyle: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w200,
-                              color: widget.readOnly
-                                  ? const DigitColors().hintGrey
-                                  : DigitTheme
-                                      .instance.colorScheme.onBackground),
-                          prefixIcon: widget.prefixIcon ??
-                              (widget.prefixText == ''
-                                  ? null
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, left: 10, bottom: 10, right: 0),
-                                      child: Text(
-                                        widget.prefixText ?? '',
-                                        style: TextStyle(
-                                            fontSize: kIsWeb ? 15 : 16,
-                                            fontWeight: FontWeight.w200,
-                                            color: widget.readOnly
-                                                ? const DigitColors().hintGrey
-                                                : DigitTheme
-                                                    .instance.colorScheme
-                                                    .onBackground),
-                                      ),
-                                    )),
-                        )
-                      : InputDecoration(
-                          labelText: widget.hint,
-                          suffixIconConstraints: const BoxConstraints(
-                            maxHeight: 40,
-                            maxWidth: 100,
-                          ),
-                          prefixIconConstraints:
-                              const BoxConstraints(minWidth: 0, minHeight: 0),
-                          prefixStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: widget.readOnly
-                                ? const DigitColors().hintGrey
-                                : DigitTheme.instance.colorScheme.onBackground,
-                          ),
-                          prefixIcon: widget.prefixIcon ??
-                              (widget.prefixText == ''
-                                  ? null
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, left: 10, bottom: 10, right: 0),
-                                      child: Text(
-                                        widget.prefixText ?? '',
-                                        style: TextStyle(
-                                          fontSize: kIsWeb ? 15 : 16,
-                                          fontWeight: FontWeight.w400,
-                                          color: widget.readOnly
-                                              ? const DigitColors().hintGrey
-                                              : DigitTheme.instance.colorScheme
-                                                  .onBackground,
-                                        ),
-                                      ),
-                                    )),
-                          suffixIcon: widget.enableVoiceCommand
-                              ? IconButton(
-                                  icon: Icon(context.watch<VoiceBloc>().state is VoiceListening
-                                      ? Icons.mic
-                                      : Icons.mic_none),
-                                  onPressed: () {
-                                    final voiceBloc = context.read<VoiceBloc>();
-                                    if (context.read<VoiceBloc>().state is VoiceListening) {
-                                      voiceBloc.add(StopListening());
-                                    } else {
-                                      voiceBloc.add(StartListening());
-                                    }
-                                  },
-                                )
-                              : (widget.suffix == null
-                                  ? null
-                                  : InkWell(
-                                      onTap: widget.onTap,
-                                      child: widget.suffix,
-                                    )),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
 
 

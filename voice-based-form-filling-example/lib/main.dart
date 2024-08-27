@@ -1,3 +1,4 @@
+import 'package:dummy2/digit_text_form_screen.dart';
 import 'package:dummy2/home.dart';
 import 'package:flutter/material.dart';
 import 'package:digit_components/theme/digit_theme.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
     return  MaterialApp(
       theme: DigitTheme.instance.mobileTheme,
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(),
+      home:  DigitTextScreen(),
     );
   }
 }
