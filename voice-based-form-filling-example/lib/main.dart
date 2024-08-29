@@ -1,4 +1,6 @@
+import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:dummy2/digit_integer_form_screen.dart';
+import 'package:dummy2/digit_radio_button_list_screen.dart';
 import 'package:dummy2/digit_search_dropdown_screen.dart';
 import 'package:dummy2/digit_text_form_screen.dart';
 import 'package:dummy2/home.dart';
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
    // home: DigitIntegerFormScreen(),
 
    // now for DigitRadioButton
+   home: RadioButtonDemoScreen()
     );
   }
 }
