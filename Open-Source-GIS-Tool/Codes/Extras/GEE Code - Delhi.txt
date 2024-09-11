@@ -1,0 +1,53 @@
+var buildings_data = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons"),
+var dataset = ee.ImageCollection("GLCF/GLS_WATER"),
+var delhisf = ee.FeatureCollection("projects/egovfoundations-sg/assets/Delhi"),
+var population_data = ee.ImageCollection("CIESIN/GPWv411/GPW_Population_Count"),
+var delhi_roads_test = ee.FeatureCollection("projects/egovfoundations-sg/assets/delhi_roads_test");
+
+//Water Bodies
+var roi = ee.FeatureCollection(delhisf).geometry()
+var water = dataset.select('water');
+var water1 = water.filter(ee.Filter.bounds(roi));
+var waterVis = {
+  min: 1.0,
+  max: 4.0,
+  palette: ['fafafa', '00c5ff', 'df73ff', '828282', 'cccccc'],
+};
+var water1_median = water1.median();
+var water1_clip = water1_median.clip(roi)
+Map.addLayer(water1_clip, waterVis, 'InLand Water Bodies');
+Map.addLayer(delhisf,{color: 'black'}, 'Delhi Shape File', true, 0.6)
+
+//Point of Interest, defining common long and lats eg-(77.04,28.59)
+var poi = {
+longitude: 77.17,
+latitude: 28.74
+};
+// 77.17,28.74
+
+//Region of interest for household estimation
+var radius_of_interest_meters = 1500;
+var area_of_interest = ee.Geometry.Point([poi.longitude, poi.latitude])
+.buffer(radius_of_interest_meters);
+// Satellite data - var goes_16_data = ee.ImageCollection('NOAA/GOES/16/FDCF').filterDate(kincade.start, kincade.end).filterBounds(area_of_interest);
+//Map.addLayer(area_of_interest, {color: 'green'}, 'Area of interest', true, 0.8);
+var roi_houses = buildings_data.filterBounds(area_of_interest);
+//Map.centerObject(roi, 12);
+Map.addLayer(roi_houses, {color: 'red'}, 'Houses');
+Map.addLayer(area_of_interest, {color: 'green'}, 'Area of interest', true, 0.8);
+var count = roi_houses.size();
+print("Household estimation:",count)
+//print("Estimated Population:",count*3)
+
+//roads
+Map.addLayer(delhi_roads_test,{color: 'blue'}, 'Roads')
+
+
+//population count
+var filter_population = population_data.first().clip(delhisf)
+var population_vis_color_Palette =['ffffe7','86a192','509791','307296','2c4484','000066']
+Map.addLayer(filter_population,{min: 0, max: 1400, 'palette':population_vis_color_Palette},'Population_Count', true, 0.1)
+
+//start
+Map.centerObject(area_of_interest, 12);
+
