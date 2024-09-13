@@ -7,3 +7,11 @@ The "Open Source GIS Tool" aims to develop a user-friendly and accessible GIS to
 Main File: 
 - Codes>OpenSourceGISToolC4GT.ipynb
 - Python_Code>gistool.py
+- Python_Code>gistool.ipynb
+
+# Steps
+- Install the required libraries in CMD by: pip install -r requirements.txt --quiet
+- Run gistool.py (But this won't show interactive maps)
+- Run gistool.ipynb (This will show maps as well)
+
+
