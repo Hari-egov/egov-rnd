@@ -1,0 +1,70 @@
+var text = require('users/gena/packages:text');
+var buildings_data = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons");
+var dataset = ee.ImageCollection("GLCF/GLS_WATER");
+var delhisf = ee.FeatureCollection("projects/egovfoundations-sg/assets/Delhi");
+var delhiwards_db = ee.FeatureCollection("projects/egovfoundations-sg/assets/Delhi_Ward_Boundary_2022");
+var population_data = ee.ImageCollection("CIESIN/GPWv411/GPW_Population_Count");
+var DelhiRoads2 = ee.FeatureCollection("projects/egovfoundations-sg/assets/DelhiRoads2");
+
+//Water Bodies
+var roi = ee.FeatureCollection(delhisf).geometry()
+var water = dataset.select('water');
+var water1 = water.filter(ee.Filter.bounds(roi));
+var waterVis = {
+  min: 1.0,
+  max: 4.0,
+  palette: ['fafafa', '00c5ff', 'df73ff', '828282', 'cccccc'],
+};
+var water1_median = water1.median();
+var water1_clip = water1_median.clip(roi)
+
+//population count density
+var filter_population = population_data.first().clip(delhisf)
+var raster_vis = {
+  'max': 10000.0,
+  'palette': [
+    'ffffe7',
+    'FFc869',
+    'ffac1d',
+    'e17735',
+    'f2552c',
+    '9f0c21'
+  ],
+  'min': 0.0
+};
+Map.addLayer(filter_population,raster_vis,'Population_Density', true, 1)
+
+//V2
+var x = ee.String("Chandni Chowk") //Bhalswa
+var roi_ward = delhiwards_db.filter(ee.Filter.eq("sourceward",x));
+Map.addLayer(delhiwards_db,{color: 'green'}, 'Delhi Wards Shape File', true, 0.7)
+Map.addLayer(roi_ward,{color: 'red'}, 'Chosen Ward', true, 1)
+
+//Households
+var roi_houses = buildings_data.filterBounds(roi_ward);
+var count = roi_houses.size();
+Map.addLayer(roi_houses, {color: 'yellow'}, 'Houses', true, 0.3);
+print("Number of Building Detected:",count)
+
+//roads
+var roi_roads1 = DelhiRoads2.filter(ee.Filter.bounds(roi_ward));
+//var roi_roads2 = roi_roads1.clipToCollection(roi_ward);
+//var roi_roads2 = roi_roads1.intersection(roi_ward, 1)
+Map.addLayer(roi_roads1,{color: 'blue'}, 'Delhi Roads', true, 0.6)
+
+//Calculating Area
+var roi_area = roi_ward.geometry().area()
+var roi_area_sqkm = ee.Number(roi_area).divide(1e6)
+print("Area of the Ward is: (in Sq Km)",roi_area_sqkm)
+
+//labels
+var scale = Map.getScale() * 3
+var centroid = roi_ward.geometry().centroid()
+var t = text.draw(x, centroid, scale, {
+    fontSize:12,
+    textColor:'black',
+    outlineWidth: 3,
+    outlineColor:'white'})
+Map.addLayer(t, {}, "Labels")
+Map.centerObject(centroid, 15);
+

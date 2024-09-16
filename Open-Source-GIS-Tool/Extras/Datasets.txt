@@ -1,0 +1,8 @@
+https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings_v3_polygons
+https://developers.google.com/earth-engine/datasets/catalog/GLCF_GLS_WATER
+https://developers.google.com/earth-engine/datasets/catalog/CIESIN_GPWv411_GPW_Population_Count
+https://www.openstreetmap.org/export#map=10/28.8206/77.1886
+
+
+v1 - https://code.earthengine.google.com/66a33aea52a9332efcb5bfaca0f3784f
+v2 - https://code.earthengine.google.com/e7bf45b2f2597c59a0e4314c70028e50
