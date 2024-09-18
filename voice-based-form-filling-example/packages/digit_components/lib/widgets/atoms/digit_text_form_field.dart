@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:remove_emoji_input_formatter/remove_emoji_input_formatter.dart';
 
-
 class DigitTextFormField extends StatefulWidget {
   final bool readOnly;
   final String formControlName;
@@ -96,11 +95,13 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
               const EdgeInsets.only(
                 top: kPadding * 2,
               ),
-          labelStyle: widget.labelStyle ?? Theme.of(context).textTheme.bodyLarge,
+          labelStyle:
+              widget.labelStyle ?? Theme.of(context).textTheme.bodyLarge,
           child: Column(
             children: [
               Container(
-                color: widget.readOnly ? const DigitColors().seaShellGray : null,
+                color:
+                    widget.readOnly ? const DigitColors().seaShellGray : null,
                 child: ReactiveTextField(
                   onChanged: widget.onChanged,
                   readOnly: widget.readOnly,
@@ -136,16 +137,20 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
                           focusColor: DigitTheme.instance.colors.cloudGray,
                           suffixIcon: widget.enableVoiceCommand
                               ? IconButton(
-                                  icon: Icon(context.watch<DigitTextFormBloc>().state is VoiceListening
+                                  icon: Icon(context
+                                          .watch<DigitTextFormBloc>()
+                                          .state is VoiceListening
                                       ? Icons.mic
                                       : Icons.mic_none),
                                   onPressed: () {
-                                    final voiceBloc = context.read<DigitTextFormBloc>();
+                                    final voiceBloc =
+                                        context.read<DigitTextFormBloc>();
                                     if (context.read<DigitTextFormBloc>().state
                                         is VoiceListening) {
                                       voiceBloc.add(StopListening());
                                     } else {
-                                      voiceBloc.add(StartListening());
+                                      voiceBloc.add(StartListening(
+                                          widget.formControlName));
                                     }
                                   },
                                 )
@@ -162,13 +167,17 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
                               fontWeight: FontWeight.w200,
                               color: widget.readOnly
                                   ? const DigitColors().hintGrey
-                                  : DigitTheme.instance.colorScheme.onBackground),
+                                  : DigitTheme
+                                      .instance.colorScheme.onBackground),
                           prefixIcon: widget.prefixIcon ??
                               (widget.prefixText == ''
                                   ? null
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 10, left: 10, bottom: 10, right: 0),
+                                          top: 10,
+                                          left: 10,
+                                          bottom: 10,
+                                          right: 0),
                                       child: Text(
                                         widget.prefixText ?? '',
                                         style: TextStyle(
@@ -176,9 +185,8 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
                                             fontWeight: FontWeight.w200,
                                             color: widget.readOnly
                                                 ? const DigitColors().hintGrey
-                                                : DigitTheme
-                                                    .instance.colorScheme
-                                                    .onBackground),
+                                                : DigitTheme.instance
+                                                    .colorScheme.onBackground),
                                       ),
                                     )),
                         )
@@ -202,7 +210,10 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
                                   ? null
                                   : Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 10, left: 10, bottom: 10, right: 0),
+                                          top: 10,
+                                          left: 10,
+                                          bottom: 10,
+                                          right: 0),
                                       child: Text(
                                         widget.prefixText ?? '',
                                         style: TextStyle(
@@ -217,15 +228,20 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
                                     )),
                           suffixIcon: widget.enableVoiceCommand
                               ? IconButton(
-                                  icon: Icon(context.watch<DigitTextFormBloc>().state is VoiceListening
+                                  icon: Icon(context
+                                          .watch<DigitTextFormBloc>()
+                                          .state is VoiceListening
                                       ? Icons.mic
                                       : Icons.mic_none),
                                   onPressed: () {
-                                    final voiceBloc = context.read<DigitTextFormBloc>();
-                                    if (context.read<DigitTextFormBloc>().state is VoiceListening) {
+                                    final voiceBloc =
+                                        context.read<DigitTextFormBloc>();
+                                    if (context.read<DigitTextFormBloc>().state
+                                        is VoiceListening) {
                                       voiceBloc.add(StopListening());
                                     } else {
-                                      voiceBloc.add(StartListening());
+                                      voiceBloc.add(StartListening(
+                                          widget.formControlName));
                                     }
                                   },
                                 )
@@ -246,19 +262,7 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 // old code
-
 
 // import 'package:digit_components/digit_components.dart';
 // import 'package:flutter/foundation.dart';
@@ -478,9 +482,8 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
 //       );
 // }
 
-
 // // Resolved the internt bug issue with the voice command feature
-// // ready for presentation in tech council 
+// // ready for presentation in tech council
 // import 'package:digit_components/digit_components.dart';
 // import 'package:flutter/foundation.dart';
 // import 'package:flutter/material.dart';
@@ -760,5 +763,3 @@ class _DigitTextFormFieldState extends State<DigitTextFormField> {
 //     );
 //   }
 // }
-
-

@@ -50,10 +50,13 @@ making it easier to maintain and test.
 */
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
   final stt.SpeechToText _speech = stt.SpeechToText();
+  final FlutterTts _flutterTts = FlutterTts();
   bool _isListening = false;
   bool _isInitialized = false;
 
@@ -63,6 +66,9 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
 
     on<StartListening>((event, emit) async {
       debugPrint('StartListening event received');
+      await _flutterTts.speak("Please say input for ${event.fieldName} field");
+      await _flutterTts.awaitSpeakCompletion(true);
+      await Future.delayed(const Duration(milliseconds: 100));
 
       if (!_isInitialized) {
         _isInitialized = await _speech.initialize();
@@ -71,10 +77,14 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
       }
 
       if (_isInitialized && !_isListening) {
-        _speech.listen(onResult: (result) {
-          debugPrint('Recognized words: ${result.recognizedWords}');
-          add(UpdateText(result.recognizedWords));
-        });
+        _speech.listen(
+            onResult: (result) {
+              print("RESULT:");
+              print(result);
+              debugPrint('Recognized words: ${result.recognizedWords}');
+              add(UpdateText(result.recognizedWords));
+            },
+            listenOptions: stt.SpeechListenOptions(cancelOnError: true));
         _isListening = true;
         emit(VoiceListening());
         debugPrint('VoiceListening state emitted');
@@ -94,18 +104,26 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
       }
     });
 
-    on<UpdateText>((event, emit) {
+    on<UpdateText>((event, emit) async {
       debugPrint('UpdateText event received with text: ${event.text}');
       emit(VoiceTextUpdated(event.text));
       _isListening = false;
       _resetListeningState();
+      await _flutterTts.speak(event.text);
+      await _flutterTts.awaitSpeakCompletion(true);
     });
   }
 
   // Speech initialization
   void _initializeSpeech() async {
-    _isInitialized = await _speech.initialize();
+    _isInitialized = await _speech.initialize(onError: errorListener);
     debugPrint('Speech recognition initialized: $_isInitialized');
+  }
+
+  Future<void> errorListener(SpeechRecognitionError error) async {
+    await _flutterTts.speak("Sorry couldn't recognize the speech");
+    await _flutterTts.awaitSpeakCompletion(true);
+    add(StopListening());
   }
 
   // Method to reset _isListening based on actual speech service state
@@ -117,13 +135,14 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
   }
 }
 
- 
 // Event
-
 
 abstract class VoiceEvent {}
 
-class StartListening extends VoiceEvent {}
+class StartListening extends VoiceEvent {
+  final String fieldName;
+  StartListening(this.fieldName);
+}
 
 class StopListening extends VoiceEvent {}
 
@@ -131,7 +150,6 @@ class UpdateText extends VoiceEvent {
   final String text;
   UpdateText(this.text);
 }
-
 
 // States
 
@@ -147,5 +165,3 @@ class VoiceTextUpdated extends VoiceState {
   final String text;
   VoiceTextUpdated(this.text);
 }
-
-
