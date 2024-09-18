@@ -1,4 +1,5 @@
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
+import 'package:dummy2/c4gt.dart';
 import 'package:dummy2/digit_checkbox_screen.dart';
 import 'package:dummy2/digit_integer_form_screen.dart';
 import 'package:dummy2/digit_radio_button_list_screen.dart';
@@ -30,9 +31,11 @@ class MyApp extends StatelessWidget {
 
    // now for DigitRadioButton
   //  home: RadioButtonDemoScreen()
-    home : DigitCheckboxTestScreen()
+  //  home : DigitCheckboxTestScreen()
+  home : VoiceCommandDemoScreen()
     );
   }
+  
 }
 
 
