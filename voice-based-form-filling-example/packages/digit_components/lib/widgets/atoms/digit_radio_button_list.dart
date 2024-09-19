@@ -85,7 +85,7 @@ class DigitRadioButtonList<T> extends StatelessWidget {
                                     .state is ListeningState) {
                                   bloc.add(StopListening());
                                 } else {
-                                  bloc.add(StartListening());
+                                  bloc.add(StartListening(formControlName));
                                 }
                               },
                             ),

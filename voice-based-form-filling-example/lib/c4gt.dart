@@ -22,7 +22,7 @@ class _VoiceCommandDemoScreenState extends State<VoiceCommandDemoScreen> {
     'checkbox': FormControl<bool>(value: false),
     'date': FormControl<DateTime>(),
     'counter': FormControl<int>(value: 0),
-    'gender': FormControl<String>(validators: [Validators.required]),
+    'country': FormControl<String>(validators: [Validators.required]),
     'dropdown': FormControl<String>(validators: [Validators.required]),
     'name': FormControl<String>(validators: [Validators.required]),
   });
@@ -68,7 +68,7 @@ class _VoiceCommandDemoScreenState extends State<VoiceCommandDemoScreen> {
                 create: (context) => DigitRadioButtonListBloc(),
                 child: DigitRadioButtonList<String>(
                   enableVoice: true,
-                  formControlName: 'gender',
+                  formControlName: 'country',
                   labelText: 'Select Country',
                   options: genderOptions,
                   valueMapper: (value) => value.toString(),
