@@ -119,7 +119,7 @@ class _DigitIntegerFormPickerState extends State<DigitIntegerFormPicker> {
                             if (state is SpeechListeningState) {
                               _speechBloc.stopListening();
                             } else {
-                              _speechBloc.startListening();
+                              _speechBloc.startListening(widget.formControlName);
                             }
                           },
                         ),

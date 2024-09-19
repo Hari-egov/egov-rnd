@@ -68,7 +68,7 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
       debugPrint('StartListening event received');
       await _flutterTts.speak("Please say input for ${event.fieldName} field");
       await _flutterTts.awaitSpeakCompletion(true);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 200));
 
       if (!_isInitialized) {
         _isInitialized = await _speech.initialize();
@@ -79,8 +79,8 @@ class DigitTextFormBloc extends Bloc<VoiceEvent, VoiceState> {
       if (_isInitialized && !_isListening) {
         _speech.listen(
             onResult: (result) {
-              print("RESULT:");
-              print(result);
+              debugPrint("RESULT : {$result}");
+             // debugPrint(result);
               debugPrint('Recognized words: ${result.recognizedWords}');
               add(UpdateText(result.recognizedWords));
             },
