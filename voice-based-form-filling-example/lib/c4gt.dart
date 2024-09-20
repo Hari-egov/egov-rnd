@@ -23,7 +23,7 @@ class _VoiceCommandDemoScreenState extends State<VoiceCommandDemoScreen> {
     'date': FormControl<DateTime>(),
     'counter': FormControl<int>(value: 0),
     'country': FormControl<String>(validators: [Validators.required]),
-    'dropdown': FormControl<String>(validators: [Validators.required]),
+    'Fruits': FormControl<String>(validators: [Validators.required]),
     'name': FormControl<String>(validators: [Validators.required]),
   });
 
@@ -120,7 +120,7 @@ class _VoiceCommandDemoScreenState extends State<VoiceCommandDemoScreen> {
                 create: (context) => DigitReactiveSearchDropdownBloc(),
                 child: DigitReactiveSearchDropdown(
                   label: 'Select a Fruit',
-                  formControlName: 'dropdown',
+                  formControlName: 'Fruits',
                   enableVoiceCommand: true,
                   menuItems: const [
                     'Apple',

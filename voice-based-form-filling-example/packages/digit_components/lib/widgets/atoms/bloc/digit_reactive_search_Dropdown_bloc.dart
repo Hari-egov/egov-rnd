@@ -1,98 +1,96 @@
+
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tts/flutter_tts.dart';
 
-/*
 
- * BLoC Events:
- * 
- * Abstract class `DigitReactiveSearchDropdownEvent` represents all possible events
- * for the DigitReactiveSearchDropdown BLoC. Specific event classes extend this abstract
- * class to define various actions that can be triggered.
+
+//  * BLoC Events:
+//  * 
+//  * Abstract class `DigitReactiveSearchDropdownEvent` represents all possible events
+//  * for the DigitReactiveSearchDropdown BLoC. Specific event classes extend this abstract
+//  * class to define various actions that can be triggered.
  
- */
+
+// Events
 abstract class DigitReactiveSearchDropdownEvent {}
 
-/// Event to start listening to voice input.
-class StartListening extends DigitReactiveSearchDropdownEvent {}
+/// Event to start listening to voice input
+class StartListening extends DigitReactiveSearchDropdownEvent {
+  final String fieldName;
+  StartListening(this.fieldName);
+}
 
-/// Event to stop listening to voice input.
+/// Event to stop listening to voice input
 class StopListening extends DigitReactiveSearchDropdownEvent {}
 
-/// Event that carries the recognized text from the speech recognition process.
+/// Event that carries the recognized text from the speech recognition process
 class SpeechResult extends DigitReactiveSearchDropdownEvent {
   final String recognizedWords;
-
   SpeechResult(this.recognizedWords);
 }
 
-/// Event to reset the listening state.
+/// Event to reset the listening state
 class ResetListening extends DigitReactiveSearchDropdownEvent {}
 
-/*
-
- * BLoC States:
- * 
- * Abstract class `DigitReactiveSearchDropdownState` represents all possible states
- * for the DigitReactiveSearchDropdown BLoC. Specific state classes extend this abstract
- * class to define different states of the BLoC.
- 
- */
+// States
 abstract class DigitReactiveSearchDropdownState {}
 
-/// Initial state when the BLoC is created.
+/// Initial state when the BLoC is created
 class DigitReactiveSearchDropdownInitial extends DigitReactiveSearchDropdownState {}
 
-/// State indicating that the BLoC is currently listening for voice input.
+/// State indicating that the BLoC is currently listening for voice input
 class ListeningState extends DigitReactiveSearchDropdownState {}
 
-/// State indicating that the BLoC is not listening for voice input.
+/// State indicating that the BLoC is not listening for voice input
 class NotListeningState extends DigitReactiveSearchDropdownState {}
 
-/// State representing successful speech recognition with recognized words.
+/// State representing successful speech recognition with recognized words
 class SpeechRecognitionSuccess extends DigitReactiveSearchDropdownState {
   final String recognizedWords;
-
   SpeechRecognitionSuccess(this.recognizedWords);
 }
 
-/// State indicating that no match was found for the recognized words.
+/// State indicating that no match was found for the recognized words
 class NoMatchFound extends DigitReactiveSearchDropdownState {}
 
-/*
-
- * BLoC Implementation:
- * 
- * `DigitReactiveSearchDropdownBloc` handles the business logic related to speech recognition.
- * It manages the state transitions based on events and interacts with the speech-to-text service.
-  
- */
+/// BLoC for handling speech recognition and text-to-speech in a reactive search dropdown
 class DigitReactiveSearchDropdownBloc
     extends Bloc<DigitReactiveSearchDropdownEvent, DigitReactiveSearchDropdownState> {
+  // Speech recognition instance
   final stt.SpeechToText _speech = stt.SpeechToText();
+  // Text-to-speech instance
+  final FlutterTts _flutterTts = FlutterTts();
+  // Flag to track if we're currently listening
   bool _isListening = false;
-  bool _isInitialized = false; // Track initialization status
+  // Flag to track if speech recognition has been initialized
+  bool _isInitialized = false;
 
-  /// Constructor initializes the BLoC with the initial state.
   DigitReactiveSearchDropdownBloc() : super(DigitReactiveSearchDropdownInitial()) {
-    // Event handler for StartListening event
+    // Handler for StartListening event
     on<StartListening>((event, emit) async {
       debugPrint('Event: StartListening');
 
-      // Initialize speech-to-text service if not already initialized
+      // Initialize speech recognition if not already done
       if (!_isInitialized) {
         bool available = await _initializeSpeech();
         if (!available) {
           debugPrint('Speech recognition not available');
-          return; // Exit if initialization fails
+          return;
         }
       }
+
+      // Provide voice prompt to the user before starting speech recognition
+      await _flutterTts.speak("Please say input for ${event.fieldName} field");
+      await _flutterTts.awaitSpeakCompletion(true);
+      await Future.delayed(const Duration(milliseconds: 200));
 
       // Start listening if not already listening
       if (!_isListening) {
         _isListening = true;
-        emit(ListeningState()); // Emit ListeningState to indicate listening has started
+        emit(ListeningState());
         _speech.listen(
           onResult: (val) => add(SpeechResult(val.recognizedWords)),
         );
@@ -102,37 +100,38 @@ class DigitReactiveSearchDropdownBloc
       }
     });
 
-    // Event handler for StopListening event
-    on<StopListening>((event, emit) {
+    // Handler for StopListening event
+    on<StopListening>((event, emit) async {
       debugPrint('Event: StopListening');
       _isListening = false;
-      _speech.stop(); // Stop the speech recognition service
-      emit(NotListeningState()); // Emit NotListeningState to indicate listening has stopped
+      await _speech.stop();
+      emit(NotListeningState());
       debugPrint('Listening stopped');
     });
 
-    // Event handler for SpeechResult event
+    // Handler for SpeechResult event
     on<SpeechResult>((event, emit) async {
       debugPrint('Event: SpeechResult with recognized words: ${event.recognizedWords}');
-      emit(SpeechRecognitionSuccess(event.recognizedWords)); // Emit SpeechRecognitionSuccess with recognized words
+      emit(SpeechRecognitionSuccess(event.recognizedWords));
 
-      // Automatically stop listening after processing the speech result
+      // Provide voice feedback with the recognized text
+      await _flutterTts.speak("You said: ${event.recognizedWords}");
+      await _flutterTts.awaitSpeakCompletion(true);
+
+      // Wait a moment before stopping listening
+      await Future.delayed(const Duration(milliseconds: 1000));
       add(StopListening());
     });
 
-    // Event handler for ResetListening event
+    // Handler for ResetListening event
     on<ResetListening>((event, emit) {
       debugPrint('Event: ResetListening');
       _isListening = false;
-      emit(NotListeningState()); // Emit NotListeningState to reset the listening state
+      emit(NotListeningState());
     });
   }
 
-  /*
-   * Initializes the speech-to-text service.
-   * 
-   * @returns Future<bool> - returns true if initialization is successful, false otherwise.
-   */
+  /// Initialize the speech recognition service
   Future<bool> _initializeSpeech() async {
     bool available = await _speech.initialize(
       onStatus: (val) => debugPrint('onStatus: $val'),
@@ -143,10 +142,15 @@ class DigitReactiveSearchDropdownBloc
     return available;
   }
 
-  /*
-   * Public method to reset the listening state.
-   */
+  /// Public method to reset the listening state
   void resetListening() {
-    add(ResetListening()); // Dispatch ResetListening event to reset the state
+    add(ResetListening());
+  }
+
+  /// Handle speech recognition errors
+  Future<void> errorListener(dynamic error) async {
+    await _flutterTts.speak("Sorry, I couldn't recognize the speech");
+    await _flutterTts.awaitSpeakCompletion(true);
+    add(StopListening());
   }
 }

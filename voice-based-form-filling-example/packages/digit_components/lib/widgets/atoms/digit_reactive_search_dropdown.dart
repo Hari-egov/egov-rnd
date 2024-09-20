@@ -197,7 +197,7 @@ class _DigitReactiveSearchDropdownState<T>
                           _bloc.add(StopListening());
                         } else {
                           print('Starting listening');
-                          _bloc.add(StartListening());
+                          _bloc.add(StartListening(widget.formControlName));
                         }
                       },
                     ),
