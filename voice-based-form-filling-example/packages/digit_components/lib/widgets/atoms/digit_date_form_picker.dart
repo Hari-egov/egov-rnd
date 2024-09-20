@@ -169,7 +169,7 @@ class _DigitDateFormPickerState extends State<DigitDateFormPicker> {
     if (dateBloc.state is DatePickerListening) {
       dateBloc.add(StopListeningEvent());
     } else {
-      dateBloc.add(StartListeningEvent());
+      dateBloc.add(StartListeningEvent(widget.formControlName));
     }
   }
 }
