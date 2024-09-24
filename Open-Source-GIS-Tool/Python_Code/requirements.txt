@@ -3,3 +3,10 @@ osmnx
 mapclassify
 geemap
 geojson
+leafmap
+folium
+geopandas
+csv
+
+
+
