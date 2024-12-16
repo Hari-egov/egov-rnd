@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:vehicle_tracker_app/data/hive_service.dart';
 import 'package:vehicle_tracker_app/data/http_service.dart';
+import 'package:vehicle_tracker_app/data/secure_storage_service.dart';
 
 import '../constants.dart';
 import '../models/localization/localization_hive/localization_hive_model.dart';
@@ -78,8 +79,9 @@ class LocalizationService {
 
   // get localization from API
   static Future<List<LocalizationMessageModel>?> getLocalicationFromAPI(String locale) async {
+
     final localizationUrl = "$unifiedDevApiUrl/localization/messages/v1/_search";
-    final url = "$localizationUrl?module=rainmaker-fsm&locale=$locale&tenantId=pb.amritsar";
+    final url = "$localizationUrl?module=rainmaker-fsm&locale=$locale&tenantId=pg";
 
     Map<String, dynamic> body = {
       "RequestInfo": {
