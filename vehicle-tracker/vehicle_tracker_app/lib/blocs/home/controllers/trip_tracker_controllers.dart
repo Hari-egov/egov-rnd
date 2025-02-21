@@ -266,6 +266,9 @@ class TripControllers extends GetxController {
 
   // ? Start trip dialog box by using the tripId
   Future<void> startTrip(BuildContext context, Rx<HomeTripModel> data) async {
+
+  
+
     await DigitDialog.show(
       context,
       options: DigitDialogOptions(
@@ -305,4 +308,12 @@ class TripControllers extends GetxController {
       ),
     );
   }
+
+ // Check active trips on logout
+void isActiveTrips(){
+
+  
+
+} 
+
 }
