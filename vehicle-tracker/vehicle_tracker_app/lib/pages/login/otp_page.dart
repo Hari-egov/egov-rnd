@@ -89,7 +89,7 @@ class _OTPPageState extends State<OTPPage> {
                   height: 8,
                 ),
                 Text(
-                  "${AppTranslation.ENTER_OTP_SENT}${loginController.userNameController.text}",
+                  "${AppTranslation.ENTER_OTP_SENT.tr}${loginController.userNameController.text}",
                   style: textTheme.labelMedium,
                 ),
 
